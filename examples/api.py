@@ -44,5 +44,15 @@ def call_chat_completions_stream(model_id, messages, max_tokens, temperature, ap
         # 如果发生异常，打印错误信息
         print(f"An error occurred: {e}")
 
+def get_model_list(api_key):
+    # 创建 OpenAI 客户端实例
+    client = OpenAI(api_key=api_key, base_url="https://api.moonshot.cn/v1")
+    
+    # 获取模型列表
+    model_list = client.models.list()
+    model_data = model_list.data
+    print(model_data)
+    return model_data
+
 
 
