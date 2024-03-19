@@ -42,7 +42,7 @@ with gr.Blocks() as demo:
         with gr.Column(scale=4):
             chat = gr.ChatInterface(
                 predict,
-                additional_inputs=[model_id, max_tokens, temperature],
+                additional_inputs=[model_id, max_tokens, temperature, stream],
             )
 
     with gr.Row():
