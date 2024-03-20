@@ -1,10 +1,15 @@
-from openai import OpenAI
-import gradio as gr
 import os
 import api
 import json
-from dotenv import load_dotenv
 import md_content
+import pretty_errors
+import traceback
+import gradio as gr
+import pandas as pd
+from datetime import datetime
+from openai import OpenAI
+from dotenv import load_dotenv
+
 
 # 加载上一级目录中的 .env 文件
 load_dotenv(dotenv_path="../.env")
@@ -34,11 +39,69 @@ def on_get_models_clicked():
     model_data = [(model.id, model.created, model.object, model.owned_by, str(model.permission)) for model in model_list]
     return model_data
 
+def upload_file(file):
+    print("file 类型:", type(file))
+    print("file 内容:", file)
+    
+    try:
+        file_object = api.upload_file(file, api_key)
+        if file_object:
+            file_id = file_object.id
+            print("文件 ID:", file_id)
+            return file_id
+        else:
+            print("文件上传失败,file_object 为 None")
+            return "上传失败,可能是不支持的文件类型"
+    
+    except Exception as e:
+        print("文件上传时发生错误:")
+        print(traceback.format_exc())
+        return "文件上传时发生错误"
+
+def file_extract(file_id):
+    file_content = api.file_extract(file_id, api_key)
+    return str(file_content)
+
+def copy_file_id(file_id):
+    return file_id
+
+def file_list():
+    try:
+        file_list = api.list_files(api_key)
+        files_info = []
+        for file_object in file_list.data:
+            file_info = {
+                "ID": file_object.id,
+                "大小 (字节)": file_object.bytes,
+                "创建时间": datetime.fromtimestamp(file_object.created_at).strftime('%Y-%m-%d %H:%M:%S'),
+                "文件名": file_object.filename
+            }
+            files_info.append(file_info)
+        # 创建 Pandas DataFrame
+        df = pd.DataFrame(files_info)
+        return df
+    except Exception as e:
+        print(f"Error: {e}")
+        return pd.DataFrame(columns=["ID", "大小 (字节)", "创建时间", "文件名"])
+    
+def delete_all_files():
+    df_files = file_list()
+    file_ids_to_process = df_files['ID'].tolist()
+    for file_id in file_ids_to_process:
+        api.delete_file(file_id,api_key)
+        print(f"删除文件 {file_id} 成功")
+    return "成功删除所有文件!"
+    
+def delete_file(file_id):
+    api.delete_file(file_id,api_key)
+    re_turn = str(file_id)+"已经删除成功！"
+    return re_turn
+
+
 with gr.Blocks() as demo:
-    with gr.Tab("Chat"):
+    with gr.Tab("Chat Demo"):
         with gr.Row():
             gr.Markdown("# Moonshot Chat Demo")
-
         with gr.Row():
             with gr.Column(scale=1):
                 model_id = gr.Radio(["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"], value="moonshot-v1-8k", label="model_id", info="模型的区别在于它们的最大上下文长度")
@@ -50,22 +113,55 @@ with gr.Blocks() as demo:
                     predict,
                     additional_inputs=[model_id, max_tokens, temperature, stream],
                 )
-
         with gr.Row():
             gr.Markdown(md_content.CHAT_CONTENT)
-
-    with gr.Tab("Model List"):
+    with gr.Tab("Model List API"):
+        with gr.Row(): gr.Markdown("# Moonshot Model List")
         with gr.Row():
-            # model_list_output = gr.Textbox(label="Model List", placeholder="Click 'Get Model List' to retrieve available models.")
-            model_table = gr.Dataframe(None, headers=['id', 'created', 'object', 'owned_by', 'permission'])
+            model_table = gr.Dataframe(None, headers=['model_id', 'created', 'object', 'owned_by', 'permission'])
         with gr.Row():
             get_models_button = gr.Button("Get Model List")
             get_models_button.click(on_get_models_clicked, inputs=None, outputs=model_table)
-
         with gr.Row():
             gr.Markdown(md_content.MODEL_LIST_CONTENT)
-
-
+    with gr.Tab("Files API Demo"):
+        with gr.Row(): gr.Markdown("# Moonshot Files API Demo")
+        with gr.Row():
+            with gr.Column(scale=3): 
+                with gr.Row(): gr.Markdown("## Upload File")
+                with gr.Row():
+                    with gr.Column(scale=2): 
+                        file_output = gr.Textbox(label="File ID", interactive=False)
+                    with gr.Column(scale=1): 
+                        copy_button = gr.Button("发送ID到右边")
+                with gr.Row():
+                    upload_button = gr.UploadButton("Click to Upload a File", file_types=["text"], file_count="single")
+                    upload_button.upload(upload_file, upload_button, file_output)
+            with gr.Column(scale=5): 
+                with gr.Row(): gr.Markdown("## Get Content")
+                with gr.Row():
+                    with gr.Column(scale=1): 
+                        file_id_input = gr.Textbox(label="File ID")
+                        copy_button.click(copy_file_id, file_output, file_id_input)
+                        file_extract_button = gr.Button("Extract")
+                    with gr.Column(scale=2): 
+                        file_extract_content = gr.Textbox(label="Extracted Content", interactive=False)
+                        file_extract_button.click(file_extract, file_id_input, file_extract_content)
+        with gr.Row():
+            with gr.Column(scale=1): 
+                gr.Markdown("## List Files")
+                file_list_output = gr.Dataframe()
+                file_list_button = gr.Button("List Files")
+                file_list_button.click(file_list, None, file_list_output)
+            with gr.Column(scale=1): 
+                gr.Markdown("## Delete Files")
+                file_id_delete = gr.Textbox(label="File ID To Delete")
+                with gr.Row():
+                    delete_file_button = gr.Button("Delete File")
+                    delete_file_button.click(delete_file, file_id_delete, file_id_delete)
+                    delete_file_button = gr.Button("!! Delete All Files !!")
+                    delete_file_button.click(delete_all_files, None, file_id_delete)
+                    
     demo.queue()
     demo.launch()
 

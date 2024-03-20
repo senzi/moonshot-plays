@@ -1,5 +1,5 @@
 CHAT_CONTENT = """
-            这是一个基于 Gradio 的聊天机器人应用程序,它利用了 OpenAI 的 API。
+            这是一个基于 Gradio 的聊天机器人应用程序,它利用了 Moonshot 的 API。
         
             该应用程序允许用户与聊天机器人进行对话,并自定义模型参数。
         

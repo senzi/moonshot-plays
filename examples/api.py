@@ -1,6 +1,9 @@
 from openai import OpenAI
-import os
+from pathlib import Path
+import traceback
 import asyncio
+import os
+
 
 def call_chat_completions(model_id, messages, max_tokens, temperature, api_key):
     # 创建 OpenAI 客户端实例
@@ -47,12 +50,45 @@ def call_chat_completions_stream(model_id, messages, max_tokens, temperature, ap
 def get_model_list(api_key):
     # 创建 OpenAI 客户端实例
     client = OpenAI(api_key=api_key, base_url="https://api.moonshot.cn/v1")
-    
     # 获取模型列表
     model_list = client.models.list()
-    model_data = model_list.data
-    print(model_data)
-    return model_data
+    return model_list.data
 
+def upload_file(files, api_key):
+    try:
+        # 创建 OpenAI 客户端实例
+        client = OpenAI(api_key=api_key, base_url="https://api.moonshot.cn/v1")
+        file_object = client.files.create(
+            file=Path(files),
+            purpose="file-extract",
+        )
+        print(f"文件 {file_object} 上传成功")
+        return file_object
+    
+    except Exception as e:
+        print(f"上传文件 {files} 时发生错误:")
+        print(traceback.format_exc())
+        # 返回 None 表示上传失败
+        return None
 
+def file_extract(file_id, api_key):
+    # 创建 OpenAI 客户端实例
+    client = OpenAI(api_key=api_key, base_url="https://api.moonshot.cn/v1")
+    # 获取文件内容
+    file_content = client.files.content(file_id=file_id).text
+    return file_content
 
+def delete_file(file_id, api_key):
+    # 创建 OpenAI 客户端实例
+    client = OpenAI(api_key=api_key, base_url="https://api.moonshot.cn/v1")
+    # 删除文件
+    client.files.delete(file_id=file_id)
+    return 0
+
+def list_files(api_key):
+    # 创建 OpenAI 客户端实例
+    client = OpenAI(api_key=api_key, base_url="https://api.moonshot.cn/v1")
+    # 获取文件列表
+    file_list = client.files.list()
+    #print(file_list)
+    return file_list
