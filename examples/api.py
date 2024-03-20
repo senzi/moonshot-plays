@@ -1,5 +1,6 @@
 from openai import OpenAI
 from pathlib import Path
+import requests
 import traceback
 import asyncio
 import os
@@ -92,3 +93,34 @@ def list_files(api_key):
     file_list = client.files.list()
     #print(file_list)
     return file_list
+
+def estimate_token_count(messages, api_key):
+    # 构建请求 URL 和头部
+    url = 'https://api.moonshot.cn/v1/tokenizers/estimate-token-count'
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}"
+    }
+    # 构建请求体
+    payload = {
+        "model": "moonshot-v1-8k",
+        "messages": messages
+    }
+    # 发送 POST 请求
+    response = requests.post(url, headers=headers, json=payload)
+    # 检查响应状态码
+    if response.status_code == 200:
+        # 解析响应内容
+        response_data = response.json()
+        # 提取 total_tokens 值
+        total_tokens = response_data.get('data', {}).get('total_tokens')
+        if total_tokens is not None:
+            return total_tokens
+        else:
+            # 如果 total_tokens 不存在，打印错误信息并返回 None
+            print(f"Error: 'total_tokens' not found in response data. Response: {response_data}")
+            return None
+    else:
+        # 如果响应状态码不是 200，打印错误信息并返回 None
+        print(f"Error: {response.status_code}, {response.text}")
+        return None

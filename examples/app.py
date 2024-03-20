@@ -97,70 +97,98 @@ def delete_file(file_id):
     re_turn = str(file_id)+"已经删除成功！"
     return re_turn
 
+def token_count(role, content):
+    message = {"role": role, "content": content}
+    messages = [message]
+    token = api.estimate_token_count(messages, api_key)
+    message_json = json.dumps(message, indent=4)
+    markdown_output = f"```json\n{message_json}\n```\n# token_count: {token}"
+    return markdown_output
 
 with gr.Blocks() as demo:
-    with gr.Tab("Chat Demo"):
-        with gr.Row():
-            gr.Markdown("# Moonshot Chat Demo")
-        with gr.Row():
-            with gr.Column(scale=1):
-                model_id = gr.Radio(["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"], value="moonshot-v1-8k", label="model_id", info="模型的区别在于它们的最大上下文长度")
-                max_tokens = gr.Slider(label="Max Tokens", minimum=100, maximum=8000, value=100, step=10)
-                temperature = gr.Slider(label="Temperature", minimum=0.0, maximum=1.0, value=0.3, step=0.1)
-                stream = gr.Radio(["True", "False"], value="True", label="stream", info="是否开启流式传输")
-            with gr.Column(scale=4):
-                chat = gr.ChatInterface(
-                    predict,
-                    additional_inputs=[model_id, max_tokens, temperature, stream],
-                )
-        with gr.Row():
-            gr.Markdown(md_content.CHAT_CONTENT)
-    with gr.Tab("Model List API"):
-        with gr.Row(): gr.Markdown("# Moonshot Model List")
-        with gr.Row():
-            model_table = gr.Dataframe(None, headers=['model_id', 'created', 'object', 'owned_by', 'permission'])
-        with gr.Row():
-            get_models_button = gr.Button("Get Model List")
-            get_models_button.click(on_get_models_clicked, inputs=None, outputs=model_table)
-        with gr.Row():
-            gr.Markdown(md_content.MODEL_LIST_CONTENT)
-    with gr.Tab("Files API Demo"):
-        with gr.Row(): gr.Markdown("# Moonshot Files API Demo")
-        with gr.Row():
-            with gr.Column(scale=3): 
-                with gr.Row(): gr.Markdown("## Upload File")
-                with gr.Row():
-                    with gr.Column(scale=2): 
-                        file_output = gr.Textbox(label="File ID", interactive=False)
-                    with gr.Column(scale=1): 
-                        copy_button = gr.Button("发送ID到右边")
-                with gr.Row():
-                    upload_button = gr.UploadButton("Click to Upload a File", file_types=["text"], file_count="single")
-                    upload_button.upload(upload_file, upload_button, file_output)
-            with gr.Column(scale=5): 
-                with gr.Row(): gr.Markdown("## Get Content")
-                with gr.Row():
-                    with gr.Column(scale=1): 
-                        file_id_input = gr.Textbox(label="File ID")
-                        copy_button.click(copy_file_id, file_output, file_id_input)
-                        file_extract_button = gr.Button("Extract")
-                    with gr.Column(scale=2): 
-                        file_extract_content = gr.Textbox(label="Extracted Content", interactive=False)
-                        file_extract_button.click(file_extract, file_id_input, file_extract_content)
-        with gr.Row():
-            with gr.Column(scale=1): 
-                gr.Markdown("## List Files")
-                file_list_output = gr.Dataframe()
-                file_list_button = gr.Button("List Files")
-                file_list_button.click(file_list, None, file_list_output)
-            with gr.Column(scale=1): 
-                gr.Markdown("## Delete Files")
-                file_id_delete = gr.Textbox(label="File ID To Delete")
-                with gr.Row():
-                    delete_file_button = gr.Button("Delete File")
-                    delete_file_button.click(delete_file, file_id_delete, file_id_delete)
-                    delete_file_button = gr.Button("!! Delete All Files !!")
-                    delete_file_button.click(delete_all_files, None, file_id_delete)
+    with gr.Row(): gr.Markdown("# Moonshot APIs Demo")
+    with gr.Row():
+        with gr.Tab("Chat Demo"):
+            with gr.Row():
+                gr.Markdown("# Moonshot Chat Demo")
+            with gr.Row():
+                with gr.Column(scale=1):
+                    model_id = gr.Radio(["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"], value="moonshot-v1-8k", label="model_id", info="模型的区别在于它们的最大上下文长度")
+                    max_tokens = gr.Slider(label="Max Tokens", minimum=100, maximum=8000, value=100, step=10)
+                    temperature = gr.Slider(label="Temperature", minimum=0.0, maximum=1.0, value=0.3, step=0.1)
+                    stream = gr.Radio(["True", "False"], value="True", label="stream", info="是否开启流式传输")
+                with gr.Column(scale=4):
+                    chat = gr.ChatInterface(
+                        predict,
+                        additional_inputs=[model_id, max_tokens, temperature, stream],
+                    )
+            with gr.Row():
+                gr.Markdown(md_content.CHAT_CONTENT)
+        with gr.Tab("Model List API"):
+            with gr.Row(): gr.Markdown("# Moonshot Model List")
+            with gr.Row():
+                model_table = gr.Dataframe(None, headers=['model_id', 'created', 'object', 'owned_by', 'permission'])
+            with gr.Row():
+                get_models_button = gr.Button("Get Model List")
+                get_models_button.click(on_get_models_clicked, inputs=None, outputs=model_table)
+            with gr.Row():
+                gr.Markdown(md_content.MODEL_LIST_CONTENT)
+        with gr.Tab("Files API Demo"):
+            with gr.Row(): gr.Markdown("# Moonshot Files API Demo")
+            with gr.Row():
+                with gr.Column(scale=3): 
+                    with gr.Row(): gr.Markdown("## Upload File")
+                    with gr.Row():
+                        with gr.Column(scale=2): 
+                            file_output = gr.Textbox(label="File ID", interactive=False)
+                        with gr.Column(scale=1): 
+                            copy_button = gr.Button("发送ID到右边")
+                    with gr.Row():
+                        upload_button = gr.UploadButton("Click to Upload a File", file_types=["text"], file_count="single")
+                        upload_button.upload(upload_file, upload_button, file_output)
+                with gr.Column(scale=5): 
+                    with gr.Row(): gr.Markdown("## Get Content")
+                    with gr.Row():
+                        with gr.Column(scale=1): 
+                            file_id_input = gr.Textbox(label="File ID")
+                            copy_button.click(copy_file_id, file_output, file_id_input)
+                            file_extract_button = gr.Button("Extract")
+                        with gr.Column(scale=2): 
+                            file_extract_content = gr.Textbox(label="Extracted Content", interactive=False)
+                            file_extract_button.click(file_extract, file_id_input, file_extract_content)
+            with gr.Row():
+                with gr.Column(scale=1): 
+                    gr.Markdown("## List Files")
+                    file_list_output = gr.Dataframe()
+                    file_list_button = gr.Button("List Files")
+                    file_list_button.click(file_list, None, file_list_output)
+                with gr.Column(scale=1): 
+                    gr.Markdown("## Delete Files")
+                    file_id_delete = gr.Textbox(label="File ID To Delete")
+                    with gr.Row():
+                        delete_file_button = gr.Button("Delete File")
+                        delete_file_button.click(delete_file, file_id_delete, file_id_delete)
+                        delete_file_button = gr.Button("!! Delete All Files !!")
+                        delete_file_button.click(delete_all_files, None, file_id_delete)
+        with gr.Tab("Token Count"):
+            with gr.Row():
+                gr.Markdown("# Moonshot Token Count Demo")
+            with gr.Row():
+                tc_role = gr.Radio(["system", "user", "assistant"],
+                        label="Select Role",
+                        info="Choose the role of the message sender")
+            with gr.Row():
+                tc_content = gr.Textbox("Enter message content", label="Content", placeholder="Type your message here...")
+            with gr.Row():
+                tc_button = gr.Button("Calculate Token Count")
+            with gr.Row():
+                with gr.Column():
+                    tc_token = gr.Markdown("结果显示在这里", label="result")
+                    tc_button.click(token_count, [tc_role,tc_content], tc_token)
+
+
+
+
                     
     demo.queue()
     demo.launch()
