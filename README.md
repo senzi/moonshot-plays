@@ -14,7 +14,7 @@
 
 Follow these steps to set up and run the demos:
 
-1. **Navigate to the `examples` folder**: Locate the directory containing the demo scripts.
+1. **Navigate to the root directory** of the project: This is where the `.env.example` file is located.
 2. **Create and configure the `.env` file**:
    
    ```
@@ -29,7 +29,8 @@ Follow these steps to set up and run the demos:
    ```
    
    This command installs all necessary dependencies for the demos.
-4. **Launch the demo application**:
+4. **Navigate to the `examples` folder**: Locate the directory containing the demo scripts.
+5. **Launch the demo application**:
    
    ```
    python3 app.py
