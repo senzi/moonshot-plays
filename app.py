@@ -112,36 +112,41 @@ def api_key_import_env():
     load_dotenv()
     if os.path.exists(".env"):
         api_key = os.getenv("MOONSHOT_API_KEY")
-    masked_key = api_key_validation(api_key)
-    return masked_key
+    result = api_key_validation(api_key)
+    return result
 
 def api_key_validation(key_input):
-    global api_key
-    message = {"role": 'user', "content": 'ping'}
-    messages = [message]
-    try:
-        ping = api.call_chat_completions("moonshot-v1-8k", messages, 100, 0, key_input)
-        print(ping)
-        if ping is not None and hasattr(ping, 'content') and "pong" in getattr(ping, 'content', '').lower():
-            api_key = key_input
-            masked_key = key_mask(api_key)
-            return masked_key
-        else:
-            masked_key = "Invalid: Moonshot didn't SAY 'pong'."
-            return masked_key
-    except Exception as e:
-        print(e)
-        masked_key = "Invalid key"
-        return masked_key
+    global api_key, masked_key
+    if key_input:
+        message = {"role": 'user', "content": 'ping'}
+        messages = [message]
+        try:
+            ping = api.call_chat_completions("moonshot-v1-8k", messages, 100, 0, key_input)
+            print(ping)
+            if ping is not None and hasattr(ping, 'content') and "pong" in getattr(ping, 'content', '').lower():
+                api_key = key_input
+                masked_key = key_mask(api_key)
+                return "Verification successful!!\nCurrent API Key:" + str(masked_key)
+            else:
+                return "Invalid: Moonshot didn't SAY 'pong'.\nCurrent API Key:" + str(masked_key)
+        except Exception as e:
+            return  "Invalid:"+ str(e) + "\nCurrent API Key:" + str(masked_key)
+    else:
+        return "Please provide your key\nCurrent API Key:" + str(masked_key)
+
 
 def key_mask(key_to_mask):
-    prefix = "sk-"
-    if key_to_mask.startswith(prefix):
-        remaining_key = key_to_mask[len(prefix):]
-        masked_key = prefix + remaining_key[:2] + "*****" + remaining_key[-5:]
+    global masked_key
+    if key_to_mask:
+        prefix = "sk-"
+        if key_to_mask.startswith(prefix):
+            remaining_key = key_to_mask[len(prefix):]
+            masked_key = prefix + remaining_key[:2] + "*****" + remaining_key[-5:]
+        else:
+            masked_key = None
+        return masked_key
     else:
-        masked_key = "Invalid key prefix"
-    return masked_key
+        return None
 
 with gr.Blocks() as demo:
     with gr.Row(): 

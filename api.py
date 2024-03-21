@@ -6,47 +6,70 @@ import asyncio
 import os
 
 
+# 定义一个类来模拟 OpenAI 完成消息的结构
+class FakeCompletionMessage:
+    def __init__(self, content):
+        self.content = content
+
+# 伪造一个错误消息的函数
+def create_error_message(error_content):
+    return FakeCompletionMessage(content=error_content)
+
+# 使用伪造的错误消息代替真实的 API 调用错误
 def call_chat_completions(model_id, messages, max_tokens, temperature, api_key):
-    # 创建 OpenAI 客户端实例
-    client = OpenAI(api_key=api_key, base_url="https://api.moonshot.cn/v1")
-    try:
-        # 尝试调用 API
-        completion = client.chat.completions.create(
-            model=model_id,
-            messages=messages,
-            max_tokens=max_tokens,
-            temperature=temperature,
-        )
-        # 如果成功，返回完成的消息
-        print('使用了非流式传输，返回的消息为：\n', str(completion.choices[0].message.content))
-        return completion.choices[0].message
-    except Exception as e:
-        # 如果发生异常，打印错误信息
-        print(f"An error occurred: {e}")
-        return None
+    error_openai_format = create_error_message("api_key is 'None' !")
+    
+    if api_key:
+        # 创建 OpenAI 客户端实例
+        client = OpenAI(api_key=api_key, base_url="https://api.moonshot.cn/v1")
+        try:
+            # 尝试调用 API
+            completion = client.chat.completions.create(
+                model=model_id,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+            )
+            # 如果成功，返回完成的消息
+            print('使用了非流式传输，返回的消息为：\n', str(completion.choices[0].message.content))
+            return completion.choices[0].message
+        except Exception as e:
+            # 如果发生异常，使用伪造的错误消息
+            print(f"An error occurred: {e}")
+            return create_error_message(f"An error occurred: {e}")
+    else:
+        # 如果没有提供 API 密钥，也使用伪造的错误消息
+        return error_openai_format
 
 def call_chat_completions_stream(model_id, messages, max_tokens, temperature, api_key):
-    client = OpenAI(api_key=api_key, base_url="https://api.moonshot.cn/v1")
-    try:
-        # 尝试调用 API
-        response = client.chat.completions.create(
-            model=model_id,
-            messages=messages,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            stream=True,
-        )
-        partial_message = ""
-        print('使用了流式传输，返回的消息为：')
-        for chunk in response:
-            if chunk.choices[0].delta.content is not None:
-                partial_message = partial_message + chunk.choices[0].delta.content
-                print(partial_message)
-                yield partial_message
-        response.close()
-    except Exception as e:
-        # 如果发生异常，打印错误信息
-        print(f"An error occurred: {e}")
+    if api_key:
+        client = OpenAI(api_key=api_key, base_url="https://api.moonshot.cn/v1")
+        try:
+            # 尝试调用 API
+            response = client.chat.completions.create(
+                model=model_id,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                stream=True,
+            )
+            partial_message = ""
+            print('使用了流式传输，返回的消息为：')
+            for chunk in response:
+                if chunk.choices[0].delta.content is not None:
+                    partial_message = partial_message + chunk.choices[0].delta.content
+                    yield partial_message
+            print(partial_message)
+            response.close()
+        except Exception as e:
+            partial_message = "An error occurred"
+            yield partial_message
+            # 如果发生异常，打印错误信息
+            print(f"An error occurred: {e}")
+    else:
+        partial_message = "api_key is 'None' !"
+        yield partial_message
+        
 
 def get_model_list(api_key):
     # 创建 OpenAI 客户端实例
@@ -121,6 +144,6 @@ def estimate_token_count(messages, api_key):
             print(f"Error: 'total_tokens' not found in response data. Response: {response_data}")
             return None
     else:
-        # 如果响应状态码不是 200，打印错误信息并返回 None
+        # 如果响应状态码不是 200，返回响应状态码
         print(f"Error: {response.status_code}, {response.text}")
-        return None
+        return "Error:"+ str(response.status_code)
