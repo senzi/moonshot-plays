@@ -10,11 +10,13 @@ from datetime import datetime
 from openai import OpenAI
 from dotenv import load_dotenv
 
+# 初始化全局变量
+api_key = None
+masked_key = None
 
-# 加载上一级目录中的 .env 文件
-load_dotenv(dotenv_path="../.env")
-# 从环境变量中获取 API 密钥
-api_key = os.getenv("MOONSHOT_API_KEY")
+
+
+
 
 async def predict(message, history, model_id, max_tokens, temperature, stream):
     history_openai_format = []
@@ -105,18 +107,64 @@ def token_count(role, content):
     markdown_output = f"```json\n{message_json}\n```\n# token_count: {token}"
     return markdown_output
 
+def api_key_import_env():
+    global api_key
+    load_dotenv()
+    if os.path.exists(".env"):
+        api_key = os.getenv("MOONSHOT_API_KEY")
+    masked_key = api_key_validation(api_key)
+    return masked_key
+
+def api_key_validation(key_input):
+    global api_key
+    message = {"role": 'user', "content": 'ping'}
+    messages = [message]
+    try:
+        ping = api.call_chat_completions("moonshot-v1-8k", messages, 100, 0, key_input)
+        print(ping)
+        if ping is not None and hasattr(ping, 'content') and "pong" in getattr(ping, 'content', '').lower():
+            api_key = key_input
+            masked_key = key_mask(api_key)
+            return masked_key
+        else:
+            masked_key = "Invalid: Moonshot didn't SAY 'pong'."
+            return masked_key
+    except Exception as e:
+        print(e)
+        masked_key = "Invalid key"
+        return masked_key
+
+def key_mask(key_to_mask):
+    prefix = "sk-"
+    if key_to_mask.startswith(prefix):
+        remaining_key = key_to_mask[len(prefix):]
+        masked_key = prefix + remaining_key[:2] + "*****" + remaining_key[-5:]
+    else:
+        masked_key = "Invalid key prefix"
+    return masked_key
+
 with gr.Blocks() as demo:
-    with gr.Row(): gr.Markdown("# Moonshot APIs Demo")
+    with gr.Row(): 
+        with gr.Column(scale=5):
+            gr.Markdown(md_content.HOME)
+        with gr.Column(scale=2):
+            with gr.Group():
+                with gr.Row(): import_key_button = gr.Button("从env导入API Key")
+                with gr.Row(): current_key = gr.Textbox(label="API Key")
+                with gr.Row(): check_key_button = gr.Button("尝试导入上述API Key")
+                import_key_button.click(api_key_import_env, None, current_key)
+                check_key_button.click(api_key_validation, current_key, current_key)
+
     with gr.Row():
-        with gr.Tab("Chat Demo"):
+        with gr.Tab("Chat Completion"):
             with gr.Row():
                 gr.Markdown("# Moonshot Chat Demo")
             with gr.Row():
                 with gr.Column(scale=1):
-                    model_id = gr.Radio(["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"], value="moonshot-v1-8k", label="model_id", info="模型的区别在于它们的最大上下文长度")
+                    model_id = gr.Radio(["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"], value="moonshot-v1-8k", label="Model ID", info="模型的区别在于它们的最大上下文长度")
                     max_tokens = gr.Slider(label="Max Tokens", minimum=100, maximum=8000, value=100, step=10)
                     temperature = gr.Slider(label="Temperature", minimum=0.0, maximum=1.0, value=0.3, step=0.1)
-                    stream = gr.Radio(["True", "False"], value="True", label="stream", info="是否开启流式传输")
+                    stream = gr.Radio(["True", "False"], value="True", label="Stream", info="是否开启流式传输")
                 with gr.Column(scale=4):
                     chat = gr.ChatInterface(
                         predict,
@@ -124,8 +172,8 @@ with gr.Blocks() as demo:
                     )
             with gr.Row():
                 gr.Markdown(md_content.CHAT_CONTENT)
-        with gr.Tab("Model List API"):
-            with gr.Row(): gr.Markdown("# Moonshot Model List")
+        with gr.Tab("Model List"):
+            with gr.Row(): gr.Markdown("# Get Moonshot Model List")
             with gr.Row():
                 model_table = gr.Dataframe(None, headers=['model_id', 'created', 'object', 'owned_by', 'permission'])
             with gr.Row():
@@ -133,7 +181,7 @@ with gr.Blocks() as demo:
                 get_models_button.click(on_get_models_clicked, inputs=None, outputs=model_table)
             with gr.Row():
                 gr.Markdown(md_content.MODEL_LIST_CONTENT)
-        with gr.Tab("Files API Demo"):
+        with gr.Tab("File operations"):
             with gr.Row(): gr.Markdown("# Moonshot Files API Demo")
             with gr.Row():
                 with gr.Column(scale=3): 
@@ -170,11 +218,14 @@ with gr.Blocks() as demo:
                         delete_file_button.click(delete_file, file_id_delete, file_id_delete)
                         delete_file_button = gr.Button("!! Delete All Files !!")
                         delete_file_button.click(delete_all_files, None, file_id_delete)
+            with gr.Row():
+                gr.Markdown(md_content.FILE_CONTENT)
         with gr.Tab("Token Count"):
             with gr.Row():
                 gr.Markdown("# Moonshot Token Count Demo")
             with gr.Row():
                 tc_role = gr.Radio(["system", "user", "assistant"],
+                        value="system",
                         label="Select Role",
                         info="Choose the role of the message sender")
             with gr.Row():
@@ -185,7 +236,8 @@ with gr.Blocks() as demo:
                 with gr.Column():
                     tc_token = gr.Markdown("结果显示在这里", label="result")
                     tc_button.click(token_count, [tc_role,tc_content], tc_token)
-
+            with gr.Row():
+                gr.Markdown(md_content.TOKEN_CONTENT)
 
 
 

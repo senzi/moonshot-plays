@@ -1,3 +1,15 @@
+---
+title: Moonshot Plays
+emoji: 🌖
+colorFrom: green
+colorTo: yellow
+sdk: gradio
+sdk_version: 4.22.0
+app_file: app.py
+pinned: false
+license: wtfpl
+---
+
 # moonshot-plays
 
 ## Repository Introduction
@@ -29,8 +41,7 @@ Follow these steps to set up and run the demos:
    ```
    
    This command installs all necessary dependencies for the demos.
-4. **Navigate to the `examples` folder**: Locate the directory containing the demo scripts.
-5. **Launch the demo application**:
+4. **Launch the demo application**:
    
    ```
    python3 app.py
