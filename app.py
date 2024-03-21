@@ -14,10 +14,6 @@ from dotenv import load_dotenv
 api_key = None
 masked_key = None
 
-
-
-
-
 async def predict(message, history, model_id, max_tokens, temperature, stream):
     history_openai_format = []
     for human, assistant in history:
@@ -134,7 +130,6 @@ def api_key_validation(key_input):
     else:
         return "Please provide your key\nCurrent API Key:" + str(masked_key)
 
-
 def key_mask(key_to_mask):
     global masked_key
     if key_to_mask:
@@ -159,7 +154,6 @@ with gr.Blocks() as demo:
                 with gr.Row(): check_key_button = gr.Button("尝试导入上述API Key")
                 import_key_button.click(api_key_import_env, None, current_key)
                 check_key_button.click(api_key_validation, current_key, current_key)
-
     with gr.Row():
         with gr.Tab("Chat Completion"):
             with gr.Row():
@@ -243,10 +237,7 @@ with gr.Blocks() as demo:
                     tc_button.click(token_count, [tc_role,tc_content], tc_token)
             with gr.Row():
                 gr.Markdown(md_content.TOKEN_CONTENT)
-
-
-
-                    
+ 
     demo.queue()
     demo.launch()
 

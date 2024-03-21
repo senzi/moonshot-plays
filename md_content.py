@@ -9,9 +9,7 @@ HOME = """
 
 ## 备注
 
-- **Key验证**: 为了验证您的API Key是否有效，您可以尝试给Moonshot发送一个"ping"消息。这将是一个简单的请求，只会消耗极少量的Token。
-
-请确保在使用API之前，您的API Key已经通过验证，以确保顺畅的API体验。
+- 为了验证您的API Key是否有效，会尝试给Moonshot发送一个"ping"消息。这将是一个简单的请求，只会消耗极少量的Token。
 """
 
 CHAT_CONTENT = """
