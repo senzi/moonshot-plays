@@ -106,6 +106,7 @@ def token_count(role, content):
 def api_key_import_env():
     global api_key
     load_dotenv()
+    api_key_env = None
     if os.path.exists(".env"):
         api_key_env = os.getenv("MOONSHOT_API_KEY")
     result = api_key_validation(api_key_env)
