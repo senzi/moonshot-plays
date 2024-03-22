@@ -107,8 +107,8 @@ def api_key_import_env():
     global api_key
     load_dotenv()
     if os.path.exists(".env"):
-        api_key = os.getenv("MOONSHOT_API_KEY")
-    result = api_key_validation(api_key)
+        api_key_env = os.getenv("MOONSHOT_API_KEY")
+    result = api_key_validation(api_key_env)
     return result
 
 def api_key_validation(key_input):
@@ -143,6 +143,12 @@ def key_mask(key_to_mask):
     else:
         return None
 
+def api_key_deactivate():
+    global masked_key, api_key
+    masked_key = None
+    api_key = None
+    return "API Key Deactivated\nCurrent API Key:" + str(masked_key)
+
 with gr.Blocks() as demo:
     with gr.Row(): 
         with gr.Column(scale=5):
@@ -152,8 +158,10 @@ with gr.Blocks() as demo:
                 with gr.Row(): import_key_button = gr.Button("从env导入API Key")
                 with gr.Row(): current_key = gr.Textbox(label="API Key")
                 with gr.Row(): check_key_button = gr.Button("尝试导入上述API Key")
+                with gr.Row(): deactivate_key_button = gr.Button("清空 API_KEY")
                 import_key_button.click(api_key_import_env, None, current_key)
                 check_key_button.click(api_key_validation, current_key, current_key)
+                deactivate_key_button.click(api_key_deactivate, None, current_key)
     with gr.Row():
         with gr.Tab("Chat Completion"):
             with gr.Row():
