@@ -50,7 +50,6 @@ def upload_file(file):
         else:
             print("文件上传失败,file_object 为 None")
             return "上传失败,可能是不支持的文件类型"
-    
     except Exception as e:
         print("文件上传时发生错误:")
         print(traceback.format_exc())

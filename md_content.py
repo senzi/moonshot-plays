@@ -10,6 +10,7 @@ HOME = """
 ## 备注
 
 - 为了验证您的API Key是否有效，会尝试给Moonshot发送一个"ping"消息。这将是一个简单的请求，只会消耗极少量的Token。
+- 未进行充值满50元的用户，RPM: request per minute 是3，其中"ping"消息会有一次request。
 """
 
 CHAT_CONTENT = """
