@@ -4,5 +4,5 @@ python-dotenv==0.21.0
 pretty_errors==1.2.25
 sxtwl
 ichingshifa
-ephem-4.1.5
+ephem
 cn2an
