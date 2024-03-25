@@ -2,12 +2,10 @@ import os
 import api
 import json
 import md_content
-import pretty_errors
 import traceback
 import gradio as gr
 import pandas as pd
 from datetime import datetime
-from openai import OpenAI
 from dotenv import load_dotenv
 
 # 初始化全局变量
@@ -149,6 +147,25 @@ def api_key_deactivate():
     api_key = None
     return "API Key Deactivated\nCurrent API Key:" + str(masked_key)
 
+def moonshot_api_demo():
+    print("Starting Moonshot API Demo...")
+    with gr.Blocks() as demo:
+        with gr.Row(): 
+            with gr.Column(scale=5):
+                gr.Markdown(md_content.HOME)
+            with gr.Column(scale=2):
+                with gr.Group():
+                    with gr.Row(): import_key_button = gr.Button("从env导入API Key")
+                    with gr.Row(): current_key = gr.Textbox(label="API Key")
+                    with gr.Row(): check_key_button = gr.Button("尝试导入上述API Key")
+                    with gr.Row(): deactivate_key_button = gr.Button("清空 API_KEY")
+
+        import_key_button.click(api_key_import_env, None, current_key)
+        check_key_button.click(api_key_validation, current_key, current_key)
+        deactivate_key_button.click(api_key_deactivate, None, current_key)
+
+    return demo
+
 def run():
     print("Starting Moonshot API Demo...")
     with gr.Blocks() as demo:
@@ -247,9 +264,9 @@ def run():
                         tc_button.click(token_count, [tc_role,tc_content], tc_token)
                 with gr.Row():
                     gr.Markdown(md_content.TOKEN_CONTENT)
-    
+
         demo.queue()
-        demo.launch()
+        demo.launch(inbrowser=True)
 
 if __name__ == '__main__':
     run()
