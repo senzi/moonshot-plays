@@ -76,14 +76,16 @@ def gr_block_header():
                 check_key_button.click(api_key_validation, current_key, current_key)
                 deactivate_key_button.click(api_key_deactivate, None, current_key)
 
-# 检查是否直接运行了此脚本
-if __name__ == "__main__":
-    with gr.Blocks() as demo:
-        gr_block_header()
-        api_demo.tab_chat()
-        api_demo.tab_model_list()
-        api_demo.tab_file_operations()
-        api_demo.tab_token_count()
-        template.template_tab()
-    demo.queue()
-    demo.launch(inbrowser=True,server_port=7888)
+print("test000")
+with gr.Blocks() as demo:
+    gr_block_header()
+    print("show gr_block_header")
+    api_demo.tab_chat()
+    api_demo.tab_model_list()
+    api_demo.tab_file_operations()
+    api_demo.tab_token_count()
+    template.template_tab()
+    print("show template_tab")
+print("test111")
+demo.queue()
+demo.launch()
