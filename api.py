@@ -4,6 +4,8 @@ import requests
 import traceback
 import asyncio
 import os
+import logging
+from requests.exceptions import RequestException
 
 
 # 定义一个类来模拟 OpenAI 完成消息的结构
@@ -41,34 +43,40 @@ def call_chat_completions(model_id, messages, max_tokens, temperature, api_key):
         # 如果没有提供 API 密钥，也使用伪造的错误消息
         return error_openai_format
 
+
+
+# 配置日志记录
+logging.basicConfig(level=logging.INFO)
+
 def call_chat_completions_stream(model_id, messages, max_tokens, temperature, api_key):
-    if api_key:
-        client = OpenAI(api_key=api_key, base_url="https://api.moonshot.cn/v1")
-        try:
-            # 尝试调用 API
-            response = client.chat.completions.create(
-                model=model_id,
-                messages=messages,
-                max_tokens=max_tokens,
-                temperature=temperature,
-                stream=True,
-            )
-            partial_message = ""
-            print('使用了流式传输，返回的消息为：')
-            for chunk in response:
-                if chunk.choices[0].delta.content is not None:
-                    partial_message = partial_message + chunk.choices[0].delta.content
-                    yield partial_message
-            print(partial_message)
-            response.close()
-        except Exception as e:
-            partial_message = "An error occurred"
-            yield partial_message
-            # 如果发生异常，打印错误信息
-            print(f"An error occurred: {e}")
-    else:
-        partial_message = "api_key is 'None' !"
-        yield partial_message
+    if not api_key:
+        raise ValueError("api_key is not provided or is invalid.")
+    
+    client = OpenAI(api_key=api_key, base_url="https://api.moonshot.cn/v1")  
+    try:
+        response = client.chat.completions.create(
+            model=model_id,
+            messages=messages,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            stream=True,
+            timeout=30  # 设置30秒超时
+        )
+        partial_message = ""
+        logging.info('使用了流式传输，返回的消息为：')
+        for chunk in response:
+            if chunk.choices[0].delta.content is not None:
+                partial_message += chunk.choices[0].delta.content
+                yield partial_message
+        logging.info(partial_message)
+    except RequestException as e:
+        raise e  # 重新抛出请求异常
+    except TimeoutError:
+        raise TimeoutError("API调用超时，可能需要检查网络连接或服务器状态。")  # 重新抛出超时异常
+    except Exception as e:
+        logging.error(f"发生错误: {e}")
+        raise e  # 重新抛出其他所有异常
+
         
 
 def get_model_list(api_key):

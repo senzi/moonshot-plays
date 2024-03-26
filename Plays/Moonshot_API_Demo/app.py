@@ -107,7 +107,7 @@ def tab_chat():
                 model_id = gr.Radio(["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"], value="moonshot-v1-8k", label="Model ID", info="模型的区别在于它们的最大上下文长度")
                 max_tokens = gr.Slider(label="Max Tokens", minimum=100, maximum=8000, value=100, step=10)
                 temperature = gr.Slider(label="Temperature", minimum=0.0, maximum=1.0, value=0.3, step=0.1)
-                stream = gr.Radio(["True", "False"], value="True", label="Stream", info="是否开启流式传输")
+                stream = gr.Radio(["False"], value="False", label="Stream", info="流式传输目前实现有Bug")
             with gr.Column(scale=4):
                 chat = gr.ChatInterface(
                     predict,
