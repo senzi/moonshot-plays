@@ -76,7 +76,6 @@ def gr_block_header():
                 check_key_button.click(api_key_validation, current_key, current_key)
                 deactivate_key_button.click(api_key_deactivate, None, current_key)
 
-print("test000")
 with gr.Blocks() as demo:
     gr_block_header()
     print("show gr_block_header")
@@ -84,8 +83,8 @@ with gr.Blocks() as demo:
     api_demo.tab_model_list()
     api_demo.tab_file_operations()
     api_demo.tab_token_count()
+    iching.tab_iching()
     template.template_tab()
-    print("show template_tab")
-print("test111")
+
 demo.queue()
 demo.launch()
