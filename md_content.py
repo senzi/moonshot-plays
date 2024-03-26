@@ -1,11 +1,11 @@
 HOME = """
-# Moonshot API Playground
+# Moonshot Playground
 
 ## 步骤
 
-1. **导入API Key**: 在页面右侧，您可以选择导入已存在于`.env`文件中的API Key，或者手动输入您自己的API Key并进行验证导入。
+1. **导入API Key**: 在页面右侧，手动输入您自己的API Key并进行验证导入。离开页面前，点击清空 API_KEY以免个人key泄露。
    
-2. **选择API Demo**: 在下方区域，浏览并选择您想要体验的API Demo。选择后，您将能够直接在Playground中测试和体验Moonshot提供的API功能。
+2. **选择Demo**: 在下方区域，浏览并选择您想要体验的Demo。选择后，您将能够直接在Playground中测试和体验搭载Moonshot的各种应用Demo。
 
 ## 备注
 
