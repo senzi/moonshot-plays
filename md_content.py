@@ -392,3 +392,109 @@ iface.launch()
 
 For more detailed information on the Token Count API and its usage, please refer to the [official documentation](https://platform.moonshot.cn/docs/api-reference#%E8%AE%A1%E7%AE%97-token).
 """
+
+TEMPLATE_CONTENT = """
+# Development and Usage Guide for Tab Template 📚
+
+## Development Process 🛠️
+
+1. **Environment Preparation**: Ensure that your environment has the `gradio` library and `api` module installed. If not, use the corresponding package management tool to install them.
+
+2. **Code Writing**: Follow these steps to write your Tab template code:
+
+   - 📂 Import necessary modules, including `api`, `os`, `gradio`, and `config`.
+   - 📝 Define Markdown content, which will be used to describe your Tab template.
+   - 🔐 Use `config.api_key` as the API key, but remember not to expose the value of the key directly.
+   - 💡 Define processing functions, such as `handle_button_click`, to handle user input and triggered events.
+   - 🎨 Use `gradio`'s Tab and Row components to build the interface, including Markdown display, text input, buttons, and output display.
+
+3. **Testing**: 🧪 Run your code in a local environment to ensure that all components work properly and the logic is correct.
+
+4. **Deployment**: 🚀 Deploy your code to a server or cloud platform to ensure that users can access and use your Tab template.
+
+## Integration into Main Application 🔄
+
+To integrate the Tab template into your main application, you need to perform the following operations in the `app.py` file located in the root directory:
+
+1. **Import Module**: 📦 Import the `app` from the `Plays.Tab_Template` module and refer to it as `template`.
+
+   ```python
+   from Plays.Tab_Template import app as template
+   ```
+
+2. **Create Gradio Interface**: 🌐 Use Gradio's `Blocks` component to create a dynamic interface and call the `template_tab()` function within it.
+
+   ```python
+   with gr.Blocks() as demo:
+       # Other components and logic
+       template.template_tab()
+   ```
+
+3. **Launch Application**: 🚀 Use the `queue()` and `launch()` methods to prepare and start the application.
+
+   ```python
+   demo.queue()
+   demo.launch()
+   ```
+
+## Usage Process 📱
+
+1. **Access the Application**: 🌐 Users can access the application by visiting the deployment address of your application to open the Tab template interface.
+
+2. **Input Data**: 🔍 Users can enter data they wish to process in the text input box.
+
+3. **Trigger Events**: 🎯 Users click the button component to trigger the corresponding processing function.
+
+4. **View Results**: 📊 After the processing function is executed, the results will be displayed in the output component.
+
+## Notes 📝
+
+- **Security**: 🛡️ Ensure the security of your code when handling user input to avoid any operations that may lead to security vulnerabilities.
+- **Performance**: 🏎️ Optimize the logic of your code to ensure the responsiveness and efficiency of the application.
+- **User Experience**: 🎮 Design an intuitive and easy-to-use interface so that users can easily understand and operate.
+- **Maintenance and Updates**: 🧩 Regularly maintain and update the code to fix any potential issues and add new features.
+- **Compliance with Laws and Regulations**: 📜 Always comply with relevant laws and regulations, and respect user privacy during development and usage.
+
+By following the above development, integration, and usage processes, you can create a secure and efficient Tab template to provide users with a quality service experience. Also, continue to learn and improve to adapt to the ever-changing technological environment and user needs. 🌟
+"""
+
+ICHING_CONTENT = """
+# README for IChing Tab Application 🌟
+
+## Overview 📊
+
+The IChing Tab Application is a cutting-edge tool that seamlessly merges the profound insights of the IChing with the latest advancements in technology. This application, built with the user-friendly Gradio framework and the powerful OpenAI API, offers a unique, interactive platform for seeking guidance and wisdom from the IChing, a revered system of divination that has stood the test of time.
+
+## Features 🚀
+
+- **Dynamic Hexagram Generation**: The app generates a hexagram randomly, ensuring an unbiased and fresh perspective with each use.
+- **In-Depth IChing Insights**: By harnessing the `ichingshifa` module, the app delivers comprehensive interpretations of the hexagrams cast.
+- **User-Centric Design**: The intuitive Gradio interface ensures that users can easily pose their questions and obtain insights at the click of a button.
+- **Seamless AI Integration**: The app integrates with the OpenAI API to provide detailed, expert-level analysis of the IChing, tailored to the user's query.
+- **Customizable Prompts**: The AI is guided by a thoughtfully designed system prompt to ensure clear, decisive answers that address the user's question directly.
+
+## How to Use 🤖
+
+1. **Launch the App**: Open the application in your web browser to access the IChing Tab.
+2. **Pose Your Question**: Input your question or concern into the designated text box.
+3. **Cast Your Hexagram**: Click the "起卦" (Cast Hexagram) button to generate a hexagram and initiate the divination process.
+4. **Receive Wisdom**: The app will present a detailed analysis, connecting the generated hexagram to your question and offering guidance rooted in the ancient wisdom of the IChing.
+
+## Technical Specifications 🔧
+
+- The `ichingshifa` module is utilized for the generation and interpretation of hexagrams.
+- The `api` module facilitates communication with the OpenAI API, using `config.api_key` for secure access.
+- The `gradio` library is employed to craft a dynamic and responsive web interface.
+- Random hexagram generation is achieved through the `random` module.
+- Configuration settings, such as the API key, are managed through the `config` module.
+
+## Contribution and Support 🤝
+
+Your feedback, suggestions, and potential contributions are highly valued. Please get in touch with us if you have any ideas on how to enhance the application or if you encounter any issues. We are dedicated to refining the user experience and ensuring that the IChing Tab Application remains a valuable resource for those seeking wisdom and guidance.
+
+## License 📜
+
+This project is licensed under the DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE (WTFPL). This permissive license allows you to do whatever you want with this software, including running, studying, sharing, and modifying it without any restrictions. For more information, please see the LICENSE file included in the project.
+
+Enjoy exploring the depths of the IChing and discovering timeless wisdom with the IChing Tab Application. 🧘‍♂️🔮
+"""

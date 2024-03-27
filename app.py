@@ -87,4 +87,4 @@ with gr.Blocks() as demo:
     template.template_tab()
 
 demo.queue()
-demo.launch()
+demo.launch(inbrowser=True)
