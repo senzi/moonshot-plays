@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 import Plays.Moonshot_Iching_Demo.app as iching
 import Plays.Moonshot_API_Demo.app as api_demo
 import Plays.Tab_Template.app as template
+import Plays.AutoWriter_Demo.app as writer
 
 # 初始化全局变量
 api_key = config.api_key
@@ -19,8 +20,17 @@ def api_key_import_env():
     api_key_env = None
     if os.path.exists(".env"):
         api_key_env = os.getenv("MOONSHOT_API_KEY")
-    result = api_key_validation(api_key_env)
-    return result
+        config.api_key = api_key_env
+        masked_key = key_mask(config.api_key)
+    return  "Current API Key:" + str(masked_key)
+
+def just_import_key(key_input):
+    global masked_key
+    config.api_key = key_input
+    masked_key = key_mask(config.api_key)
+    return  "Current API Key:" + str(masked_key)
+
+
 
 def api_key_validation(key_input):
     global masked_key
@@ -61,20 +71,24 @@ def api_key_deactivate():
     return "API Key Deactivated\nCurrent API Key:" + str(masked_key)
 
 def gr_block_header():
-    with gr.Row(): 
-        with gr.Column(scale=5):
-            gr.Markdown(md_content.HOME)
-        with gr.Column(scale=2):
-            with gr.Group():
-                if config.Config.DEBUG:
-                    with gr.Row(): import_key_button = gr.Button("从env导入API Key")
-                with gr.Row(): current_key = gr.Textbox(label="API Key")
-                with gr.Row(): check_key_button = gr.Button("尝试导入上述API Key")
-                with gr.Row(): deactivate_key_button = gr.Button("清空 API_KEY")
-                if config.Config.DEBUG:
-                    import_key_button.click(api_key_import_env, None, current_key)
-                check_key_button.click(api_key_validation, current_key, current_key)
-                deactivate_key_button.click(api_key_deactivate, None, current_key)
+    with gr.Group():
+        with gr.Row(): 
+            with gr.Column(scale=5):
+                gr.Markdown(md_content.HOME)
+            with gr.Column(scale=2):
+                with gr.Group():
+                    if config.Config.DEBUG:
+                        with gr.Row(): import_key_button = gr.Button("从env导入API Key[DEBUG]")
+                    with gr.Row(): current_key = gr.Textbox(label="API Key")
+                    with gr.Row(): 
+                        check_key_button = gr.Button("验证并导入Key")
+                        just_import_button = gr.Button("直接导入Key")
+                    with gr.Row(): deactivate_key_button = gr.Button("清空 API_KEY")
+                    if config.Config.DEBUG:
+                        import_key_button.click(api_key_import_env, None, current_key)
+                    check_key_button.click(api_key_validation, current_key, current_key)
+                    just_import_button.click(just_import_key, current_key, current_key)
+                    deactivate_key_button.click(api_key_deactivate, None, current_key)
 
 with gr.Blocks() as demo:
     gr_block_header()
@@ -84,6 +98,7 @@ with gr.Blocks() as demo:
     api_demo.tab_file_operations()
     api_demo.tab_token_count()
     iching.tab_iching()
+    writer.Autowriter_tab()
     template.template_tab()
 
 demo.queue()
