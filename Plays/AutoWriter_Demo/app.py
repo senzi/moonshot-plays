@@ -8,24 +8,6 @@ import json
 # 如果需要用到Moonshot的API,请使用config.api_key作为key传入
 # 但无论任何时候，都不应该直接暴露config.api_key的值(显示、打印)
 
-def xxx(query):
-    api_key = config.api_key
-    model_id = "moonshot-v1-8k"
-    max_tokens = 2000
-    temperature = 0.5
-    sys_prompt = """
-    你是一个周易解卦大师，请根据提供的卦象信息和用户的问题，进行专业且详细的易经解卦分析。
-    输出的结果不要模棱两可，要根据卦象信息，针对用户的问题，给出一个十分肯定的答案。
-    """
-    openai_format = []
-    openai_format.append({"role": "system", "content": sys_prompt})
-    openai_format.append({"role": "system", "content": "卦象信息如下："})
-    openai_format.append({"role": "user", "content": "用户问题："+query})
-    messages = openai_format
-    response = api.call_chat_completions(model_id, messages, max_tokens, temperature, api_key).content  
-    return str(response)  
-
-
 def extract_json_from_string(json_string):
     try:
         # 尝试解析整个字符串为 JSON
@@ -46,7 +28,7 @@ def generate_catalog(length, topic):
     api_key = config.api_key
     model_id = "moonshot-v1-8k"
     max_tokens = 2000
-    temperature = 0.5
+    temperature = 0.1
     sys_prompt = string1+string2
     openai_format = []
     openai_format.append({"role": "system", "content": sys_prompt})
@@ -55,9 +37,26 @@ def generate_catalog(length, topic):
     print(response)
     re_json = extract_json_from_string(response)
     return re_json
-    
 
-
+def generate_full_article(catalog, topic):
+    string1 = """
+    需要用Markdown格式写一篇文章，文章的主题是"{topic}"。请按以下要求实现这个章节的内容：
+    """.format(topic=topic)
+    full_article = ""
+    for chapter_key in catalog:
+        string2 = (f"### {catalog[chapter_key]}")
+        sys_prompt = string1+string2
+        api_key = config.api_key
+        model_id = "moonshot-v1-8k"
+        max_tokens = 2000
+        temperature = 0.1
+        openai_format = []
+        openai_format.append({"role": "system", "content": sys_prompt})
+        messages = openai_format
+        print("正在编写："+str(chapter_key))
+        response = api.call_chat_completions(model_id, messages, max_tokens, temperature, api_key).content
+        full_article = full_article + "\n" + response
+    return [full_article,full_article]
 
     
 
@@ -65,12 +64,15 @@ def Autowriter_tab():
     with gr.Tab("Autowriter"):
         with gr.Row():
             gr.Markdown("# Autowriter Demo")
-        with gr.Row():test = gr.Textbox(label="test")
         with gr.Row():
             with gr.Group():
                 with gr.Row(): length = gr.Radio(["短篇", "中篇", "长篇"], label="篇幅", info="请选择文章篇幅")
                 with gr.Row(): topic  = gr.Textbox(label="简述主题")
             catalog = gr.JSON(label = "大纲JSON")
         with gr.Row(): json_button = gr.Button("生成大纲")
+        with gr.Row(): full_article_button = gr.Button("生成全文")
         json_button.click(fn=generate_catalog, inputs=[length, topic], outputs=catalog)
-	
+        with gr.Row():full_article = gr.Textbox(label="全文输出")
+        with gr.Row():full_article_md = gr.Markdown(label="全文渲染")
+        full_article_button.click(fn=generate_full_article, inputs=[catalog, topic], outputs=[full_article, full_article_md])
+            

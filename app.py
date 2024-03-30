@@ -15,6 +15,8 @@ import Plays.AutoWriter_Demo.app as writer
 api_key = config.api_key
 masked_key = None
 
+
+
 def api_key_import_env():
     load_dotenv()
     api_key_env = None
@@ -29,8 +31,6 @@ def just_import_key(key_input):
     config.api_key = key_input
     masked_key = key_mask(config.api_key)
     return  "Current API Key:" + str(masked_key)
-
-
 
 def api_key_validation(key_input):
     global masked_key
@@ -89,6 +89,9 @@ def gr_block_header():
                     check_key_button.click(api_key_validation, current_key, current_key)
                     just_import_button.click(just_import_key, current_key, current_key)
                     deactivate_key_button.click(api_key_deactivate, None, current_key)
+
+if config.Config.DEBUG:
+    api_key_import_env()
 
 with gr.Blocks() as demo:
     gr_block_header()
