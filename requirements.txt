@@ -7,3 +7,9 @@ ichingshifa
 ephem
 cn2an
 asyncio
+pyusb
+Pillow
+qrcode
+pyserial
+python-barcode
+python-escpos[all]
