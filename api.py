@@ -155,3 +155,40 @@ def estimate_token_count(messages, api_key):
         # 如果响应状态码不是 200，返回响应状态码
         print(f"Error: {response.status_code}, {response.text}")
         return "Error:"+ str(response.status_code)
+
+def query_balance(api_key):
+
+    # 接口请求地址
+    url = "https://api.moonshot.cn/v1/users/me/balance"
+
+    # 构建请求头，包含认证信息
+    headers = {
+        "Authorization": f"Bearer {api_key}"
+    }
+
+    try:
+        # 发送GET请求
+        response = requests.get(url, headers=headers)
+
+        # 检查请求是否成功
+        if response.status_code == 200:
+            # 解析响应内容
+            balance_data = response.json()
+            
+            # 检查响应数据中的status字段
+            if balance_data["status"]:
+                return {
+                    "available_balance": balance_data["data"]["available_balance"],
+                    "voucher_balance": balance_data["data"]["voucher_balance"],
+                    "cash_balance": balance_data["data"]["cash_balance"]
+                }
+            else:
+                # 如果status不为true，返回错误信息
+                return {"error": "查询失败，服务端返回错误状态。"}
+        else:
+            # 如果HTTP请求失败，返回错误信息
+            return {"error": f"请求失败，状态码：{response.status_code}"}
+
+    except requests.RequestException as e:
+        # 如果请求过程中出现异常，返回错误信息
+        return {"error": str(e)}

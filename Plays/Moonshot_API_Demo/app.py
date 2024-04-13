@@ -98,6 +98,11 @@ def token_count(role, content):
     markdown_output = f"```json\n{message_json}\n```\n# token_count: {token}"
     return markdown_output
 
+def query_balanc():
+    result = api.query_balance(config.api_key)
+    return str(result)
+
+
 def tab_chat():
     with gr.Tab("Chat Completion"):
         with gr.Row():
@@ -187,6 +192,17 @@ def tab_token_count():
                 tc_button.click(token_count, [tc_role,tc_content], tc_token)
         with gr.Row():
             gr.Markdown(md_content.TOKEN_CONTENT)
+
+def tab_query_balanc():
+    with gr.Tab("Query Balanc"):
+        with gr.Row():
+            gr.Markdown("# Moonshot Query Balanc Demo")
+        with gr.Row():
+            qb_button = gr.Button("query_balanc")
+        with gr.Row():
+            with gr.Column():
+                qb_result = gr.Markdown("结果显示在这里", label="result")
+                qb_button.click(query_balanc, None, qb_result)
 
 
 if __name__ == '__main__':

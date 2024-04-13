@@ -10,7 +10,6 @@ import Plays.Moonshot_Iching_Demo.app as iching
 import Plays.Moonshot_API_Demo.app as api_demo
 import Plays.Tab_Template.app as template
 import Plays.AutoWriter_Demo.app as writer
-import Plays.Real_Print.app as pprint
 
 # 初始化全局变量
 api_key = config.api_key
@@ -101,10 +100,10 @@ with gr.Blocks() as demo:
     api_demo.tab_model_list()
     api_demo.tab_file_operations()
     api_demo.tab_token_count()
+    api_demo.tab_query_balanc()
     iching.tab_iching()
     writer.Autowriter_tab()
     template.template_tab()
-    pprint.tab_print_chat()
 
 demo.queue()
 demo.launch(inbrowser=True)
