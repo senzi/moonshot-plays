@@ -1,4 +1,3 @@
-import os
 import api
 import json
 import md_content
@@ -6,7 +5,6 @@ import traceback
 import gradio as gr
 import pandas as pd
 from datetime import datetime
-from dotenv import load_dotenv
 import config
 
 
@@ -123,7 +121,8 @@ def tab_chat():
 
 def tab_model_list():
     with gr.Tab("Model List"):
-        with gr.Row(): gr.Markdown("# Get Moonshot Model List")
+        with gr.Row(): 
+            gr.Markdown("# Get Moonshot Model List")
         with gr.Row():
             model_table = gr.Dataframe(None, headers=['model_id', 'created', 'object', 'owned_by', 'permission'])
         with gr.Row():
@@ -134,10 +133,12 @@ def tab_model_list():
 
 def tab_file_operations():
     with gr.Tab("File operations"):
-        with gr.Row(): gr.Markdown("# Moonshot Files API Demo")
+        with gr.Row(): 
+            gr.Markdown("# Moonshot Files API Demo")
         with gr.Row():
             with gr.Column(scale=3): 
-                with gr.Row(): gr.Markdown("## Upload File")
+                with gr.Row(): 
+                    gr.Markdown("## Upload File")
                 with gr.Row():
                     with gr.Column(scale=2): 
                         file_output = gr.Textbox(label="File ID", interactive=False)
@@ -147,7 +148,8 @@ def tab_file_operations():
                     upload_button = gr.UploadButton("Click to Upload a File", file_types=["text"], file_count="single")
                     upload_button.upload(upload_file, upload_button, file_output)
             with gr.Column(scale=5): 
-                with gr.Row(): gr.Markdown("## Get Content")
+                with gr.Row(): 
+                    gr.Markdown("## Get Content")
                 with gr.Row():
                     with gr.Column(scale=1): 
                         file_id_input = gr.Textbox(label="File ID")

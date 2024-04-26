@@ -1,7 +1,5 @@
 import os
 import api
-import importlib
-import glob
 import config
 import gradio as gr
 import md_content
@@ -78,12 +76,15 @@ def gr_block_header():
             with gr.Column(scale=2):
                 with gr.Group():
                     if config.Config.DEBUG:
-                        with gr.Row(): import_key_button = gr.Button("从env导入API Key[DEBUG]")
-                    with gr.Row(): current_key = gr.Textbox(label="API Key")
+                        with gr.Row(): 
+                            import_key_button = gr.Button("从env导入API Key[DEBUG]")
+                    with gr.Row(): 
+                        current_key = gr.Textbox(label="API Key")
                     with gr.Row(): 
                         check_key_button = gr.Button("验证并导入Key")
                         just_import_button = gr.Button("直接导入Key")
-                    with gr.Row(): deactivate_key_button = gr.Button("清空 API_KEY")
+                    with gr.Row(): 
+                        deactivate_key_button = gr.Button("清空 API_KEY")
                     if config.Config.DEBUG:
                         import_key_button.click(api_key_import_env, None, current_key)
                     check_key_button.click(api_key_validation, current_key, current_key)

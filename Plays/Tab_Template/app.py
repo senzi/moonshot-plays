@@ -1,6 +1,5 @@
 #Tab_Template/app.py
 import api
-import os
 import gradio as gr
 import config
 import md_content
@@ -22,7 +21,8 @@ def template_tab():
         with gr.Row():
             gr.Markdown("# Template")
         # 使用Markdown组件显示一些文本
-        with gr.Row(): gr.Markdown(mdcontent)
+        with gr.Row(): 
+            gr.Markdown(mdcontent)
         # 文本输入组件
         with gr.Row():
             text_input = gr.Textbox(label="输入文本")

@@ -1,10 +1,8 @@
 from ichingshifa import ichingshifa
 import api
 import random
-import config
 import gradio as gr
 import config
-import os
 import md_content
 
 

@@ -1,8 +1,6 @@
 import api
-import os
 import gradio as gr
 import config
-import md_content
 import json
 
 # 如果需要用到Moonshot的API,请使用config.api_key作为key传入
@@ -66,13 +64,19 @@ def Autowriter_tab():
             gr.Markdown("# Autowriter Demo")
         with gr.Row():
             with gr.Group():
-                with gr.Row(): length = gr.Radio(["短篇", "中篇", "长篇"], label="篇幅", info="请选择文章篇幅")
-                with gr.Row(): topic  = gr.Textbox(label="简述主题")
+                with gr.Row():
+                    length = gr.Radio(["短篇", "中篇", "长篇"], label="篇幅", info="请选择文章篇幅")
+                with gr.Row(): 
+                    topic  = gr.Textbox(label="简述主题")
             catalog = gr.JSON(label = "大纲JSON")
-        with gr.Row(): json_button = gr.Button("生成大纲")
-        with gr.Row(): full_article_button = gr.Button("生成全文")
+        with gr.Row(): 
+            json_button = gr.Button("生成大纲")
+        with gr.Row(): 
+            full_article_button = gr.Button("生成全文")
         json_button.click(fn=generate_catalog, inputs=[length, topic], outputs=catalog)
-        with gr.Row():full_article = gr.Textbox(label="全文输出")
-        with gr.Row():full_article_md = gr.Markdown(label="全文渲染")
+        with gr.Row():
+            full_article = gr.Textbox(label="全文输出")
+        with gr.Row():
+            full_article_md = gr.Markdown(label="全文渲染")
         full_article_button.click(fn=generate_full_article, inputs=[catalog, topic], outputs=[full_article, full_article_md])
             

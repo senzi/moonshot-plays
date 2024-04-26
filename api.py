@@ -2,8 +2,6 @@ from openai import OpenAI
 from pathlib import Path
 import requests
 import traceback
-import asyncio
-import os
 import logging
 from requests.exceptions import RequestException
 
