@@ -31,7 +31,7 @@ def call_chat_completions(model_id, messages, max_tokens, temperature, api_key):
                 temperature=temperature,
             )
             # 如果成功，返回完成的消息
-            print('使用了非流式传输，返回的消息为：\n', str(completion.choices[0].message.content))
+            print('使用了非流式传输，返回的消息为：\n', str(completion))
             return completion.choices[0].message
         except Exception as e:
             # 如果发生异常，使用伪造的错误消息
@@ -96,7 +96,7 @@ def upload_file(files, api_key):
         return file_object
     
     except Exception as e:
-        print(f"上传文件 {files} 时发生错误:")
+        print(f"上传文件 {files} 时发生错误:"+e)
         print(traceback.format_exc())
         # 返回 None 表示上传失败
         return None

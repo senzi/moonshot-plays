@@ -18,6 +18,7 @@ masked_key = None
 def api_key_import_env():
     load_dotenv()
     api_key_env = None
+    masked_key = "None"
     if os.path.exists(".env"):
         api_key_env = os.getenv("MOONSHOT_API_KEY")
         config.api_key = api_key_env
